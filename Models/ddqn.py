@@ -4,18 +4,13 @@ from collections import deque
 import numpy as np
 import torch
 import torch.nn as nn
-from torch.autograd import Variable
-from torchsummary import summary
-from collections import deque
-import numpy as np
-import random
 
 
 class DDQN(nn.Module):
 
     def __init__(self, inp_dim, action_dim,cuda=True):
         super(DDQN, self).__init__()
-        self.device=torch.device("cuda" if torch.cuda.is_available() and cuda==True else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() and cuda is True else "cpu")
         self.epsilon = 1
         self.feature = nn.Sequential(
             nn.Linear(inp_dim, 128),

@@ -60,7 +60,7 @@ class Driver():
         self.height = height
         self.bomb_no = bomb_no
         self.box_count = width*height
-        self.env = MineSweeper(self.width,self.height,self.bomb_no)
+        self.env = MineSweeper(self.width,self.height,self.bomb_no, rule='win7')
         self.current_model = DQN(self.box_count,self.box_count).to(device)
         self.target_model = DQN(self.box_count,self.box_count).to(device)
         self.target_model.eval()
@@ -76,14 +76,14 @@ class Driver():
         self.reward_step = 0.01
         self.batch_size = 4096
         self.tau = 5e-5
-        self.log = open("./Logs/ddqn_log.txt",'w')
+        self.log = open("./Logs/dqn_log.txt",'w')
 
         if(self.render_flag):
             self.Render = Render(self.env.state)
 
     
     def load_models(self,number):
-        path = "./pre-trained/ddqn_dnn"+str(number)+".pth"
+        path = "./pre-trained/dqn_dnn"+str(number)+".pth"
         weights = torch.load(path)
         self.current_model.load_state_dict(weights['current_state_dict'])
         self.target_model.load_state_dict(weights['target_state_dict'])
@@ -158,7 +158,7 @@ class Driver():
         return loss_print
 
     def save_checkpoints(self,batch_no):
-        path = "./pre-trained/ddqn_dnn"+str(batch_no)+".pth"
+        path = "./pre-trained/dqn_dnn"+str(batch_no)+".pth"
         torch.save({
             'epoch': batch_no,
             'current_state_dict': self.current_model.state_dict(),
@@ -187,7 +187,7 @@ class Driver():
 
 def main():
 
-    driver = Driver(6,6,6,False)
+    driver = Driver(9,9,10,False)
     state = driver.env.state
     epochs = 10000
     save_every = 2000

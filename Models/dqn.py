@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from torchsummary import summary
 from collections import deque
 import numpy as np
 import random
@@ -41,7 +40,7 @@ class DQN(nn.Module):
             masked_sums = masked_exps.sum(dim, keepdim=True) + epsilon
             return (masked_exps/masked_sums)
         
-    def forward(self, x,mask):
+    def forward(self, x, mask):
         x=x/8
         x = self.feature(x)
         advantage = self.masked_softmax(self.advantage(x),mask)
