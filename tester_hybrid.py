@@ -3,6 +3,7 @@ import torch
 from tqdm import trange
 
 from game import MineSweeper
+from Models.stochastic import STOCHASTIC
 from Models.ddqnCNN import DDQNCNNL
 
 
@@ -40,9 +41,11 @@ if __name__ == "__main__":
     test_bomb_no = 10
     test_rule = 'win7'
 
-    test_model = DDQNCNNL(test_width, test_height, test_width * test_height, nb_cuda=0)
-    test_model.cuda()
-    test_model.load_state(torch.load("pre-trained/ddqncnnl_win7_13000.pth"))
+    # test_model = DDQNCNNL(test_width, test_height, test_width * test_height, nb_cuda=0)
+    # test_model.cuda()
+    # test_model.load_state(torch.load("pre-trained/ddqncnnl_win7_13000.pth"))
+
+    test_model = STOCHASTIC()
 
     win_rate = test_hybrid(test_model, test_width, test_height, test_bomb_no, test_rule)
     print("win rate =", win_rate)
