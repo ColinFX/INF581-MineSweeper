@@ -3,7 +3,7 @@ import torch
 from tqdm import trange
 
 from game import MineSweeper
-from Models.ddqn import DDQN
+from Models.ddqnCNN import DDQNCNNL
 
 
 def test_hybrid(trained_model, width=9, height=9, bomb_no=10, rule='win7', simulation_no=20000, hybrid=True):
@@ -35,13 +35,14 @@ def test_hybrid(trained_model, width=9, height=9, bomb_no=10, rule='win7', simul
 
 
 if __name__ == "__main__":
-    test_width = 6
-    test_height = 6
-    test_bomb_no = 6
+    test_width = 9
+    test_height = 9
+    test_bomb_no = 10
     test_rule = 'win7'
 
-    test_model = DDQN(test_width * test_height, test_width * test_height, cuda=False)
-    test_model.load_state(torch.load("pre-trained/ddqn_dnn20000.pth"))
+    test_model = DDQNCNNL(test_width, test_height, test_width * test_height, nb_cuda=0)
+    test_model.cuda()
+    test_model.load_state(torch.load("pre-trained/ddqncnnl_win7_13000.pth"))
 
     win_rate = test_hybrid(test_model, test_width, test_height, test_bomb_no, test_rule)
     print("win rate =", win_rate)
