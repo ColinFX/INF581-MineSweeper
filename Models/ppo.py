@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from torchsummary import summary
 from collections import deque
 import numpy as np
 import random
@@ -21,7 +20,7 @@ class Actor(nn.Module):
             nn.Linear(128, 128),
             nn.Tanh(),
             nn.Linear(128,action_dim)
-        )        
+        )
 
     
     ### This is important, masks invalid actions

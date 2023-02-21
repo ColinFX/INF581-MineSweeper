@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
-from torchsummary import summary
 from collections import deque
 import numpy as np
 import random

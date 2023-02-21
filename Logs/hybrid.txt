@@ -1,0 +1,22 @@
+# DDQN_CNN_L_WIN7_13000 under HYBRID
+
+20000 games simulated with 16916 won (84.6%) and 3084 lost (15.4%).
+10813 games (54.1%) requested intervention, out of which 7729 succeeded (71.5%).
+
+
+# STOCHASTIC under HYBRID
+
+20000 games simulated with 16163 won (80.8%) and 3837 lost (19.2%).
+8274 games (41.4%) requested intervention, out of which 4437 succeeded (53.6%).
+
+
+# DDQN_CNN_L_WIN7_13000 without hybrid
+
+20000 games simulated with 5690 won (28.4%) and 14310 lost (71.6%).
+20000 games (100.0%) requested intervention, out of which 5690 succeeded (28.4%).
+
+
+# STOCHASTIC without hybrid
+
+20000 games simulated with 3 won (0.015%) and 19997 lost (99.985%).
+20000 games (100.0%) requested intervention, out of which 3 succeeded (0.015%).

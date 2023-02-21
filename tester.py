@@ -8,6 +8,8 @@ from ddqn import  DDQN
 from dqn import DQN
 from ppo import PPO
 from AC0 import AC0
+from ddqnCNN import DDQNCNNL
+from stochastic import STOCHASTIC
 import copy
 from scipy.special import comb
  
@@ -15,7 +17,7 @@ from renderer import Render
 from game import MineSweeper
 from renderer import Render
 
-model_list={"DDQN":DDQN, "DQN":DQN, "PPO":PPO, "AC0":AC0}
+model_list={"DDQN":DDQN, "DQN":DQN, "PPO":PPO, "AC0":AC0, "DDQNCNNL":DDQNCNNL, "STOCHASTIC":STOCHASTIC}
 
 
 
@@ -24,7 +26,7 @@ model_list={"DDQN":DDQN, "DQN":DQN, "PPO":PPO, "AC0":AC0}
 class Tester():
     def __init__(self,render_flag,model_type):       
         self.model_type=model_type
-        self.model = model_list[self.model_type](36,36,cuda=False)
+        self.model = model_list[self.model_type]()
         # self.model = DQN(36,36)
         self.render_flag = render_flag
         self.width = 6
@@ -32,7 +34,7 @@ class Tester():
         self.env = MineSweeper(self.width, self.height, 6, rule='win7')
         if (self.render_flag):
             self.renderer = Render(self.env.state)
-        self.load_models(20000)
+        # self.load_models(13000)
 
     def grid2flatten(self, row, col):
         return self.width * row + col
@@ -71,7 +73,7 @@ class Tester():
         
         
     def load_models(self,number):
-        path = "pre-trained/"+self.model_type.lower()+"_dnn"+str(number)+".pth"
+        path = "pre-trained/ddqncnnl_win7_13000.pth"
         # path = "pre-trained/dqn_dnn"+str(number)+".pth"
         dict = torch.load(path)
         self.model.load_state(dict)
@@ -321,9 +323,7 @@ def slow_tester(model_type):
             state = tester.env.state
             
 
-
-def main():
-    model_type="DDQN"
-    win_tester(1000,model_type,use_definite=False)
+if __name__ == "__main__":
+    model_type="STOCHASTIC"
+    win_tester(1000,model_type,use_definite=True)
     # slow_tester(model_type)
-main()
