@@ -147,7 +147,7 @@ class MineSweeper:
                     if self.state[i][j] == flagged_nbr_no:
                         for (ni, nj) in neighbors:
                             if self.state[ni][nj] == -1:
-                                print("AUTOPLAY", ni, nj)
+                                # print("AUTOPLAY", ni, nj)
                                 self.choose(ni, nj, auto_flag=True, auto_play=True)
                                 return
         return
