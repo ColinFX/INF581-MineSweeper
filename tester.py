@@ -12,8 +12,6 @@ from ddqnCNN import DDQNCNNL
 from stochastic import STOCHASTIC
 import copy
 from scipy.special import comb
-
-from renderer import Render
 from game import MineSweeper
 from renderer import Render
 

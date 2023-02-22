@@ -8,7 +8,17 @@ from game import MineSweeper
 from renderer import Render
 from Models.stochastic import STOCHASTIC
 from Models.ddqnCNN import DDQNCNNL
+from Models.ddqn import DDQN
+from Models.dqn import DQN
+from Models.ppo import PPO
+from Models.AC0 import AC0
 
+model_list = {"DDQN": DDQN, "DQN": DQN, "PPO": PPO, "DDQNCNNL": DDQNCNNL, "STOCHASTIC": STOCHASTIC}  # First Release
+
+weight_map = {"DDQNCNNL": "pre-trained/ddqncnnl_win7_13000.pth",
+              "DDQN": "pre-trained/ddqn_dnn20000.pth",
+              "DQN": "pre-trained/dqn_dnn10000.pth",
+              "PPO": "pre-trained/ppo_dnn8000.pth"}
 
 def test_hybrid(trained_model, width=9, height=9, bomb_no=10, rule='win7', simulation_no=2000, hybrid=True):
     """
@@ -61,7 +71,7 @@ def test_hybrid_slow(trained_model, width=9, height=9, bomb_no=10, rule='win7', 
     action taken by the model only if intervention requested by the built-in auto_play mechanism.
     """
     for game in range(simulation_no):
-        time.sleep(1.5)
+        #time.sleep(1.5)
         print(">")
         env = MineSweeper(width, height, bomb_no, rule)
         renderer = Render(env.state)
@@ -69,7 +79,7 @@ def test_hybrid_slow(trained_model, width=9, height=9, bomb_no=10, rule='win7', 
         first_click = True
         reward = None
         while not terminal:
-            time.sleep(1.5)
+            # time.sleep(1.5)
             if not first_click:
                 print("Intervention")
             first_click = False
@@ -90,23 +100,43 @@ def test_hybrid_slow(trained_model, width=9, height=9, bomb_no=10, rule='win7', 
             print("LOST")
 
 
+def load_weight(model_obj, model_type_, nb_cuda_):
+    if nb_cuda_ == -1:
+        model_obj.load_state(torch.load(weight_map[model_type_], map_location=torch.device("cpu")))
+    else:
+        model_obj.cuda()
+        model_obj.load_state(torch.load(weight_map[model_type_]))
+    return model_obj
+
+
 if __name__ == "__main__":
-    test_width = 9
-    test_height = 9
-    test_bomb_no = 10
+
+    model_type = "DDQNCNNL"
     test_rule = 'win7'
     test_simulation_no = 20000
+    nb_cuda = -1  # -1 = cpu; else specify cuda device: ex. 0 = cuda:0
+    render_flag = True
+    test_width, test_height, test_bomb_no = 9, 9, 10
 
-    test_model = DDQNCNNL(test_width, test_height, test_width * test_height, nb_cuda=0)
-    test_model.cuda()
-    test_model.load_state(torch.load("pre-trained/ddqncnnl_win7_13000.pth"))
+    if model_type == "DDQNCNNL":
+        test_model = model_list[model_type](width=test_width, height=test_height, action_dim=test_width*test_height, nb_cuda=nb_cuda)
+        test_model = load_weight(test_model, model_type, nb_cuda)
+    elif model_type in ["DDQN", "DQN", "PPO"]:
+        test_width, test_height, test_bomb_no = 6, 6, 6
+        test_model = model_list[model_type](inp_dim=test_width*test_height, action_dim=test_width*test_height)
+        test_model = load_weight(test_model, model_type, nb_cuda)
+    else:
+        # STOCHASTIC
+        test_model = model_list[model_type]()
+
     test_model.epsilon = 0
 
-    # test_model = STOCHASTIC()
+    if render_flag:
+        test_hybrid_slow(test_model, test_width, test_height, test_bomb_no, test_rule, 50, hybrid=True)
 
-    # res = test_hybrid(test_model, test_width, test_height, test_bomb_no, test_rule, test_simulation_no, hybrid=False)
-    # print(f"{test_simulation_no} games simulated with {res[0]} won ({res[0]/test_simulation_no*100}%) and {res[1]} "
-    #       f"lost ({res[1]/test_simulation_no*100}%).\n{res[2]} games ({res[2]/test_simulation_no*100}%) requested "
-    #       f"intervention, out of which {res[3]} succeeded ({res[3]/res[2]*100}%).")
+    else:
+        res = test_hybrid(test_model, test_width, test_height, test_bomb_no, test_rule, test_simulation_no, hybrid=False)
+        print(f"{test_simulation_no} games simulated with {res[0]} won ({res[0]/test_simulation_no*100}%) and {res[1]} "
+              f"lost ({res[1]/test_simulation_no*100}%).\n{res[2]} games ({res[2]/test_simulation_no*100}%) requested "
+              f"intervention, out of which {res[3]} succeeded ({res[3]/res[2]*100}%).")
 
-    test_hybrid_slow(test_model, test_width, test_height, test_bomb_no, test_rule, 50, hybrid=True)
