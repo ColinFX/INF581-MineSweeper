@@ -17,7 +17,7 @@ from renderer import Render
 
 model_list = {"DDQN": DDQN, "DQN": DQN, "PPO": PPO, "DDQNCNNL": DDQNCNNL, "STOCHASTIC": STOCHASTIC}  # First Release
 
-weight_map = {"DDQNCNNL": "pre-trained/ddqncnnl_win7_13000.pth",
+weight_map = {"DDQNCNNL": "pre-trained/ddqncnnl_win7_19000.pth",
               "DDQN": "pre-trained/ddqn_dnn20000.pth",
               "DQN": "pre-trained/dqn_dnn10000.pth",
               "PPO": "pre-trained/ppo_dnn8000.pth"}
@@ -320,6 +320,6 @@ def slow_tester(model_type):
 
 
 if __name__ == "__main__":
-    model_type = "PPO"  # STOCHASTIC, DDQNCNNL, DDQN
+    model_type = "DDQNCNNL"  # STOCHASTIC, DDQNCNNL, DDQN
     win_tester(1000, model_type, use_definite=True)
     # slow_tester(model_type)
