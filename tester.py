@@ -37,7 +37,7 @@ class Tester():
             self.model = model_list[self.model_type](width=self.width, height=self.height,
                                                      action_dim=self.width * self.height)
             self.load_models(weight_map[self.model_type])
-        elif model_type in ["DDQN", "DQN"]:
+        elif model_type in ["DDQN", "DQN", "PPO"]:
             self.width, self.height, self.nb_mines = 6, 6, 6
             self.model = model_list[self.model_type](inp_dim=self.width * self.height, action_dim=self.width * self.height)
             self.load_models(weight_map[self.model_type])
@@ -322,6 +322,6 @@ def slow_tester(model_type):
 
 
 if __name__ == "__main__":
-    model_type = "DQN"  # STOCHASTIC, DDQNCNNL, DDQN
+    model_type = "PPO"  # STOCHASTIC, DDQNCNNL, DDQN
     win_tester(1000, model_type, use_definite=True)
     # slow_tester(model_type)
