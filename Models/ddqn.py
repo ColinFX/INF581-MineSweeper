@@ -12,9 +12,9 @@ import random
 
 class DDQN(nn.Module):
 
-    def __init__(self, inp_dim, action_dim,cuda=True):
+    def __init__(self, inp_dim, action_dim, cuda=True):
         super(DDQN, self).__init__()
-        self.device=torch.device("cuda" if torch.cuda.is_available() and cuda==True else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() and cuda==True else "cpu")
         self.epsilon = 1
         self.feature = nn.Sequential(
             nn.Linear(inp_dim, 128),
@@ -40,7 +40,7 @@ class DDQN(nn.Module):
         exps = torch.exp(vec)
         masked_exps = exps * mask.float()
         masked_sums = masked_exps.sum(dim, keepdim=True) + epsilon
-        return (masked_exps / masked_sums)
+        return masked_exps / masked_sums
 
     def forward(self, x, mask):
         x = x / 8

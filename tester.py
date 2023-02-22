@@ -1,5 +1,4 @@
 import time
-
 import torch
 import numpy as np
 import sys
@@ -18,23 +17,33 @@ from renderer import Render
 from game import MineSweeper
 from renderer import Render
 
-model_list = {"DDQN": DDQN, "DQN": DQN, "PPO": PPO, "AC0": AC0, "DDQNCNNL": DDQNCNNL, "STOCHASTIC": STOCHASTIC}
+model_list = {"DDQN": DDQN, "DQN": DQN, "PPO": PPO, "DDQNCNNL": DDQNCNNL, "STOCHASTIC": STOCHASTIC}  # First Release
+
+weight_map = {"DDQNCNNL": "pre-trained/ddqncnnl_win7_13000.pth",
+              "DDQN": "pre-trained/ddqn_dnn20000.pth",
+              "DQN": "pre-trained/dqn_dnn10000.pth",
+              "PPO": "pre-trained/ppo_dnn8000.pth"}
 
 
 ### Preferably don't mess with the parameters for now.
 ### Class takes in only one parameter as initialization, render true or false
 class Tester():
-    def __init__(self, render_flag, model_type):
+    def __init__(self, render_flag, model_type, nb_cuda=-1):
         self.model_type = model_type
         # self.model = DQN(36,36)
-        self.render_flag = render_flag
+        self.render_flag = render_flag # if True, render GUI
+        self.nb_cuda = nb_cuda
         self.width = 9
         self.height = 9
-        self.model = model_list[self.model_type](width=self.width, height=self.height, action_dim=self.width * self.height,)
+        if model_type == "DDQNCNNL":
+            self.model = model_list[self.model_type](width=self.width, height=self.height, action_dim=self.width * self.height)
+            self.load_models(weight_map[self.model_type])
+        else:
+            self.model = model_list[self.model_type]()
         self.env = MineSweeper(self.width, self.height, 10, rule='win7')
-        if (self.render_flag):
+        if self.render_flag:
             self.renderer = Render(self.env.state)
-        # self.load_models(13000)
+
 
     def grid2flatten(self, row, col):
         return self.width * row + col
@@ -68,12 +77,13 @@ class Tester():
 
         return False, -1
 
-    def load_models(self, number):
-        path = "pre-trained/ddqncnnl_win7_13000.pth"
-        # path = "pre-trained/dqn_dnn"+str(number)+".pth"
-        dict = torch.load(path)
+    def load_models(self, path):
+        if self.nb_cuda == -1:
+            dict = torch.load(path, map_location=torch.device("cpu"))
+        else:
+            dict = torch.load(path)
         self.model.load_state(dict)
-        self.model.epsilon = 0
+        self.model.epsilon = 0  # overwrite exploration rate to 0
 
     def do_step(self, action):
         i = int(action / self.width)
@@ -310,6 +320,6 @@ def slow_tester(model_type):
 
 
 if __name__ == "__main__":
-    model_type = "DDQNCNNL" # STOCHASTIC
+    model_type = "DDQNCNNL" # STOCHASTIC, DDQNCNNL
     win_tester(1000, model_type, use_definite=True)
     # slow_tester(model_type)
