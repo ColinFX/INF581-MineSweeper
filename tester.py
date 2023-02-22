@@ -30,20 +30,22 @@ weight_map = {"DDQNCNNL": "pre-trained/ddqncnnl_win7_13000.pth",
 class Tester():
     def __init__(self, render_flag, model_type, nb_cuda=-1):
         self.model_type = model_type
-        # self.model = DQN(36,36)
-        self.render_flag = render_flag # if True, render GUI
+        self.render_flag = render_flag  # if True, render GUI
         self.nb_cuda = nb_cuda
-        self.width = 9
-        self.height = 9
+        self.width, self.height, self.nb_mines = 9, 9, 10
         if model_type == "DDQNCNNL":
-            self.model = model_list[self.model_type](width=self.width, height=self.height, action_dim=self.width * self.height)
+            self.model = model_list[self.model_type](width=self.width, height=self.height,
+                                                     action_dim=self.width * self.height)
+            self.load_models(weight_map[self.model_type])
+        elif model_type in ["DDQN", "DQN"]:
+            self.width, self.height, self.nb_mines = 6, 6, 6
+            self.model = model_list[self.model_type](inp_dim=self.width * self.height, action_dim=self.width * self.height)
             self.load_models(weight_map[self.model_type])
         else:
             self.model = model_list[self.model_type]()
-        self.env = MineSweeper(self.width, self.height, 10, rule='win7')
+        self.env = MineSweeper(self.width, self.height, self.nb_mines, rule='win7')
         if self.render_flag:
             self.renderer = Render(self.env.state)
-
 
     def grid2flatten(self, row, col):
         return self.width * row + col
@@ -58,7 +60,7 @@ class Tester():
 
         Decider = DefiniteDecision(self.env, state)
         state_now, possible_mines = Decider.decision()
-        if possible_mines == None or len(possible_mines) == 0:
+        if possible_mines is None or len(possible_mines) == 0:
             return False, -1
 
         new_miner_loc = possible_mines[0][0] == 2
@@ -66,7 +68,7 @@ class Tester():
             state_now[possible_mines[0][1]][possible_mines[0][2]] = -2
             Decider = DefiniteDecision(self.env, state_now)
             state_now, possible_mines = Decider.decision()
-            if possible_mines == None or len(possible_mines) == 0:
+            if possible_mines is None or len(possible_mines) == 0:
                 break
             new_miner_loc = possible_mines[0][0] == 2
 
@@ -86,7 +88,7 @@ class Tester():
         self.model.epsilon = 0  # overwrite exploration rate to 0
 
     def do_step(self, action):
-        i = int(action / self.width)
+        i = action // self.width
         j = action % self.width
 
         if (self.render_flag):
@@ -320,6 +322,6 @@ def slow_tester(model_type):
 
 
 if __name__ == "__main__":
-    model_type = "DDQNCNNL" # STOCHASTIC, DDQNCNNL
+    model_type = "DQN"  # STOCHASTIC, DDQNCNNL, DDQN
     win_tester(1000, model_type, use_definite=True)
     # slow_tester(model_type)
